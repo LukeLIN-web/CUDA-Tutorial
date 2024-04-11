@@ -1,3 +1,5 @@
+//learn how to write a simple CUDA program that performs matrix multiplication.
+
 #include <stdio.h>
 
 #define TILE_WIDTH 16

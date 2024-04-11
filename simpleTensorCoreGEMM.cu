@@ -1,3 +1,4 @@
+// learn how to use CUDA's WMMA API to perform Tensorcore matrix multiplication.
 /* Copyright (c) 1993-2017, NVIDIA CORPORATION. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -52,7 +53,7 @@
  }
  
  
- #include <mma.h>
+ #include <mma.h> // define tensorcores' API
  using namespace nvcuda;
  
  // Must be multiples of 16 for wmma code to work
