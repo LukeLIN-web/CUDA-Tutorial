@@ -31,9 +31,9 @@ void matrixMulCPU(float *A, float *B, float *C, int m, int n, int k) {
 }
 
 int main() {
-    int m = 512;
-    int n = 512;
-    int k = 512;
+    int m = 16384;
+    int n = 16384;
+    int k = 16384;
 
     float *h_A, *h_B, *h_C_CPU, *h_C_CUDA;
 
@@ -73,7 +73,7 @@ int main() {
     cudaMemcpy(d_B, h_B, size_B, cudaMemcpyHostToDevice);
 
     // Define grid and block dimensions
-    dim3 blockDim(TILE_WIDTH, TILE_WIDTH);
+    dim3 blockDim(TILE_WIDTH, TILE_WIDTH); //use loop tiling in GPU.
     dim3 gridDim((k + TILE_WIDTH - 1) / TILE_WIDTH, (m + TILE_WIDTH - 1) / TILE_WIDTH);
 
     // Launch kernel
@@ -88,7 +88,7 @@ int main() {
     struct timeval start;
     struct timeval end;
     gettimeofday(&start, NULL);
-    matrixMulCPU(h_A, h_B, h_C_CPU, m, n, k);
+    // matrixMulCPU(h_A, h_B, h_C_CPU, m, n, k);
     gettimeofday(&end, NULL);
     long long elapsed = (end.tv_sec - start.tv_sec) * 1000000LL + (end.tv_usec - start.tv_usec);
     
@@ -104,14 +104,14 @@ int main() {
 
     if (isEqual) {
         printf("Results match between CPU and CUDA.\n");
-        float gpuTime;
-        cudaEventElapsedTime(&gpuTime, startWMMA, stopWMMA);
-        printf("GPU took %fms\n", gpuTime);
-        printf("CPU elapsed time = %lld ms\n", elapsed/1000);
     } else {
         printf("Results do not match between CPU and CUDA.\n");
-        
     }
+
+    float gpuTime;
+    cudaEventElapsedTime(&gpuTime, startWMMA, stopWMMA);
+    printf("GPU took %fms\n", gpuTime);
+    printf("CPU elapsed time = %lld ms\n", elapsed/1000);
 
     // Free device memory
     cudaFree(d_A);
