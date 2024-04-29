@@ -25,7 +25,9 @@ conda install -c "nvidia/label/cuda-12.1.1" cuda-toolkit
 ```
 
 
+### reference 
 
 Reference:
 - https://cuda-tutorial.readthedocs.io/en/latest/tutorials/tutorial01/
 - https://github.com/NVIDIA-developer-blog/code-samples
+- TVM GEMM CUDA: https://github.com/LeiWang1999/tvm_gpu_gemm/tree/master/tensor_expression , https://zhuanlan.zhihu.com/p/560729749

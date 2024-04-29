@@ -1,6 +1,7 @@
 //learn how to write a simple CUDA program that performs matrix multiplication.
 
 #include <stdio.h>
+#include <sys/time.h>
 
 #define TILE_WIDTH 16
 
@@ -40,6 +41,13 @@ int main() {
     size_t size_B = n * k * sizeof(float);
     size_t size_C = m * k * sizeof(float);
 
+
+    cudaEvent_t startWMMA;
+    cudaEvent_t stopWMMA;
+    
+    cudaEventCreate(&startWMMA);
+    cudaEventCreate(&stopWMMA);
+
     // Allocate host memory
     h_A = (float *)malloc(size_A);
     h_B = (float *)malloc(size_B);
@@ -69,13 +77,21 @@ int main() {
     dim3 gridDim((k + TILE_WIDTH - 1) / TILE_WIDTH, (m + TILE_WIDTH - 1) / TILE_WIDTH);
 
     // Launch kernel
+    cudaEventRecord(startWMMA);
     matrixMul<<<gridDim, blockDim>>>(d_A, d_B, d_C, m, n, k);
-
+    cudaEventRecord(stopWMMA);
+    cudaEventSynchronize(stopWMMA);
+    
     // Transfer results from device to host
     cudaMemcpy(h_C_CUDA, d_C, size_C, cudaMemcpyDeviceToHost);
 
-    // Perform matrix multiplication on CPU
+    struct timeval start;
+    struct timeval end;
+    gettimeofday(&start, NULL);
     matrixMulCPU(h_A, h_B, h_C_CPU, m, n, k);
+    gettimeofday(&end, NULL);
+    long long elapsed = (end.tv_sec - start.tv_sec) * 1000000LL + (end.tv_usec - start.tv_usec);
+    
 
     // Compare results from CPU and CUDA
     bool isEqual = true;
@@ -88,8 +104,13 @@ int main() {
 
     if (isEqual) {
         printf("Results match between CPU and CUDA.\n");
+        float gpuTime;
+        cudaEventElapsedTime(&gpuTime, startWMMA, stopWMMA);
+        printf("GPU took %fms\n", gpuTime);
+        printf("CPU elapsed time = %lld ms\n", elapsed/1000);
     } else {
         printf("Results do not match between CPU and CUDA.\n");
+        
     }
 
     // Free device memory

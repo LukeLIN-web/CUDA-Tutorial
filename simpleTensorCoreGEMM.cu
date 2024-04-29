@@ -118,9 +118,9 @@
     if (cRow < M && cCol < N) {
        wmma::load_matrix_sync(c_frag, c + cRow + cCol * ldc, ldc, wmma::mem_col_major);
  
- #pragma unroll
+       #pragma unroll
        for(int i=0; i < c_frag.num_elements; i++) {
-          c_frag.x[i] = alpha * acc_frag.x[i] + beta * c_frag.x[i];
+          c_frag.x[i] = acc_frag.x[i];
        }
  
        // Store the output
@@ -198,8 +198,8 @@
     cudaErrCheck(cudaMemcpy(c_cublas, c, MATRIX_M * MATRIX_N * sizeof(float), cudaMemcpyDeviceToDevice));
     cudaErrCheck(cudaMemcpy(c_wmma, c, MATRIX_M * MATRIX_N * sizeof(float), cudaMemcpyDeviceToDevice));
  
-    float alpha = 2.0f;
-    float beta = 2.0f;
+    float alpha = 1.0f;
+    float beta = 0.0f;
  
  
     printf("\nM = %d, N = %d, K = %d. alpha = %f, beta = %f\n\n", MATRIX_M, MATRIX_N, MATRIX_K, alpha, beta);
